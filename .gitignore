@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project data: never upload these
+data/
+answers/
+*.csv
+*.tar.bz2
