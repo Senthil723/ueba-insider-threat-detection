@@ -28,3 +28,27 @@ ROC AUC: 0.979
 - Scoring is at the user level, not the day level.
 - Features follow the behaviors the dataset readme lists as fair game.
 - These are single-run results with no tuning.
+
+
+## Baseline comparison (version 1)
+
+Same 1,000 users and 70 insiders. Naive rules were fixed before running
+(after-hours means a first logon before 06:00 or at/after 18:00).
+Ties in the naive rankings were broken randomly (seed 42).
+
+| Method | Top 10 | Top 25 | Top 50 | Top 100 | AUC |
+|--------|--------|--------|--------|---------|-----|
+| Isolation Forest v1 | 10 | 24 | 46 | 59 | 0.979 |
+| Naive: total files copied | 0 | 1 | 1 | 5 | 0.818 |
+| Naive: total USB connects | 0 | 0 | 2 | 13 | 0.844 |
+| Naive: odd-hour first logons | 0 | 2 | 12 | 12 | 0.699 |
+| Random picking (expected) | 0.7 | 1.8 | 3.5 | 7.0 | 0.5 |
+
+Notes
+- The per-user baseline approach ranks far more insiders at the top of
+  the queue than global rules on this dataset.
+- A high AUC does not guarantee a useful top of the queue: "total files
+  copied" has AUC 0.818 but found 1 insider in its top 50.
+- Isolation Forest uses each user's worst day; naive rules use totals.
+- Not tested yet: whether the per-user z-scores alone (no model) perform as
+  well as the Isolation Forest.
