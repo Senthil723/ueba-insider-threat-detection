@@ -52,3 +52,25 @@ Notes
 - Isolation Forest uses each user's worst day; naive rules use totals.
 - Not tested yet: whether the per-user z-scores alone (no model) perform as
   well as the Isolation Forest.
+
+  
+## Per-user z-score ranking vs Isolation Forest (version 1)
+
+Same 1,000 users and 70 insiders. Rules were fixed before running:
+daily score = max or sum of three signals (absolute logon-time z-score,
+USB z-score, files-copied z-score); user score = the user's highest day.
+Ties broken randomly (seed 42). No model, no training.
+
+| Method | Top 10 | Top 25 | Top 50 | Top 100 | AUC |
+|--------|--------|--------|--------|---------|-----|
+| z-score only: max of 3 signals | 10 | 14 | 20 | 30 | 0.914 |
+| z-score only: sum of 3 signals | 10 | 20 | 25 | 41 | 0.939 |
+| Isolation Forest v1 | 10 | 24 | 46 | 59 | 0.979 |
+| Random picking (expected) | 0.7 | 1.8 | 3.5 | 7.0 | 0.5 |
+
+Notes
+- Per-user z-scores alone already beat the global rules in the earlier
+  comparison; Isolation Forest improved the ranking further on this dataset.
+- The forest also received a first-ever-USB-use flag that the z-score
+  variants did not, so the gain cannot be credited to the model alone.
+- Single run on synthetic, dense-needle data. Not a real-world estimate.
