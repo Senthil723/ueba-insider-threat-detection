@@ -1,4 +1,5 @@
 # explain.py - turn the numbers behind each alert into plain-language reasons
+import sys
 import pandas as pd
 from pathlib import Path
 
@@ -40,12 +41,12 @@ def explain(r):
         mitre.append("T1052.001")
     if r["usb_connects_z"] >= Z_MIN:
         reasons.append(f"{int(r['usb_connects'])} USB connects vs usual "
-                       f"{r['usual_usb_connects']:.1f} per day")
+                       f"{r['usual_usb_connects']:.1f} per active day")
         checks.append("was there a project or migration that explains the USB use?")
         mitre.append("T1052.001")
     if r["files_copied_z"] >= Z_MIN:
         reasons.append(f"{int(r['files_copied'])} files copied to USB vs usual "
-                       f"{r['usual_files_copied']:.1f} per day")
+                       f"{r['usual_files_copied']:.1f} per active day")
         checks.append("what file types were copied, and are they work-related?")
         mitre.append("T1052.001")
     if abs(r["first_logon_z"]) >= Z_MIN:          # NaN gives False, so it is skipped
@@ -69,8 +70,13 @@ def explain(r):
 rows = pd.concat([rows, rows.apply(explain, axis=1)], axis=1)
 rows.to_csv(OUT_DIR / "alerts_explained.csv", index=False)   # has user IDs: stays local
 
-# Print the top 10 WITHOUT user IDs or dates
-for _, r in rows.head(10).iterrows():
+# Which alerts to print? Default: ranks 1 to 10.
+# Example: python src\explain.py 40 50  -> ranks 41 to 50
+start = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+end = int(sys.argv[2]) if len(sys.argv) > 2 else 10
+
+# Print WITHOUT user IDs or dates
+for _, r in rows.iloc[start:end].iterrows():
     print(f"#{int(r['rank'])}  score {r['anomaly_score']:.3f}  |  {r['confidence']} confidence")
     print("   why  :", r["reasons"])
     print("   MITRE:", r["mitre"])
