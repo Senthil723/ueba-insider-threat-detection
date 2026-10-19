@@ -122,6 +122,7 @@ python src/evaluate.py          # compare with the answer key (counts only)
 python src/error_analysis.py    # false positives, scenario 3
 python src/naive_baseline.py    # global-rule comparison
 python src/zscore_baseline.py   # z-score-only comparison
+python src/explain.py           # plain-language reasons (optional: 40 50 for ranks 41-50)
 ```
 
 ## Repository layout
@@ -131,9 +132,16 @@ docs/        scope, design decisions, results, false-positive analysis, learning
 src/         pipeline scripts
 ```
 
-## Roadmap (planned, not built yet)
+## Roadmap
 
+Phase 3 (partly done)
+- Done: plain-language alert reasons with a confidence label
+  (`src/explain.py`), a draft triage guide, and a MITRE mapping
+  (`docs/mitre-mapping.md`).
+- Not built yet: validating the reasons with an analyst, richer
+  explanations.
+
+Not built yet
 - Phase 2: LDAP role and unusual-PC features, web browsing logs, a second model.
-- Phase 3: plain-language alert explanations and a triage guide.
 - Phase 4: a local analyst dashboard (Streamlit). Local only, because of the
   data licence.
