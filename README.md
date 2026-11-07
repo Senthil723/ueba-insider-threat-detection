@@ -93,6 +93,30 @@ baselines (11 and 13 earlier days). Two were real deviations from long
 baselines, so they would still deserve a look from an analyst. Details are in
 `docs/false-positive-analysis.md`.
 
+## Analyst dashboard
+
+A local, SIEM-style dashboard (Streamlit) shows the results the way an analyst
+would work with them. It is **not** a real SIEM: it reads the saved result
+files and does not collect logs live.
+
+- **Overview:** alert counts by severity, main signal, month and MITRE
+  technique, the top 10 riskiest users, and company-wide activity per week.
+- **Alert queue:** ranked alerts with filters and a CSV download.
+- **Alert detail:** why a user was flagged, the flagged day compared with the
+  user's usual behavior, what an analyst would check, and an activity timeline.
+- **Evaluation:** precision and recall at k, and ROC AUC (counts only).
+
+Severity bands follow rank (Critical = top 10, High = 11-50, Medium = 51-100).
+This is a triage convention for the project, not a model output.
+
+The dashboard runs **locally only**, because the dataset licence does not allow
+publishing the data. User IDs are anonymized by default, and the screenshots
+below show no real IDs or raw rows.
+
+![Overview](docs/images/overview.png)
+![Alert detail](docs/images/alert-detail.png)
+![Evaluation](docs/images/evaluation.png)
+
 ## Limitations
 
 - Synthetic, dense-needle data: real-world precision would be far lower
@@ -105,7 +129,7 @@ baselines, so they would still deserve a look from an analyst. Details are in
 
 ## How to run
 
-Requirements: Python 3.13, pandas and scikit-learn
+Requirements: Python 3.13, pandas, scikit-learn and Streamlit
 (`pip install -r requirements.txt`).
 
 1. Download the r4.2 data and the answer key, and extract only `logon.csv`,
@@ -123,16 +147,24 @@ python src/error_analysis.py    # false positives, scenario 3
 python src/naive_baseline.py    # global-rule comparison
 python src/zscore_baseline.py   # z-score-only comparison
 python src/explain.py           # plain-language reasons (optional: 40 50 for ranks 41-50)
+python -m streamlit run src/app.py   # local analyst dashboard
 ```
+
+The dashboard reads the files saved by the scripts above. Set the two folder
+paths at the top of `src/app.py` to your own folders.
 
 ## Repository layout
 
 ```
 docs/        scope, design decisions, results, false-positive analysis, learning log
-src/         pipeline scripts
+docs/images/ dashboard screenshots
+src/         pipeline scripts and the dashboard (app.py)
 ```
 
 ## Roadmap
+
+Phase 4 (done)
+- A local analyst dashboard (Streamlit) in `src/app.py`.
 
 Phase 3 (partly done)
 - Done: plain-language alert reasons with a confidence label
@@ -143,5 +175,3 @@ Phase 3 (partly done)
 
 Not built yet
 - Phase 2: LDAP role and unusual-PC features, web browsing logs, a second model.
-- Phase 4: a local analyst dashboard (Streamlit). Local only, because of the
-  data licence.
